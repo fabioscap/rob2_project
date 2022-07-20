@@ -1,3 +1,5 @@
+addpath(genpath("utils"))
+
 % gravity terms
 g0 = 9.81;
 g = g0*[0;-1;0];
@@ -50,7 +52,7 @@ T = DHplus(table);
 r = [d1 d2 d3; 0 0 0; 0 0 0];
 
 % initial state
-q0 = [-pi/2;0;0];
+q0 = [0;0;0];
 qd0 = [0;0;0];
 theta0 = [0;0;0];
 thetad0 = [0;0;0];
@@ -77,8 +79,8 @@ directDyn = (M\(u-c-gr));
 % -> change integrator blocks
 % -> change elastic force
 
-open("RRR_elastic_joints")
+open("directRRR")
 % https://it.mathworks.com/help/symbolic/generate-matlab-function-blocks.html
-matlabFunctionBlock("RRR_elastic_joints/RRR/euler_lagrange",directDyn,"vars",[u q qd])
+matlabFunctionBlock("directRRR/euler_lagrange",directDyn,"vars",[u q qd])
 
 
