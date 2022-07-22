@@ -1,3 +1,2 @@
-% out = sim('RRR_rigid_joints',10); % run for 10 seconds
-out = sim('PD_rigid',10); % run for 10 seconds
-show_movie(T,q,out.qout,l)
+out = sim('PD_rigid',30); % run for 30 seconds
+show_movie(T,q,out.q,l)

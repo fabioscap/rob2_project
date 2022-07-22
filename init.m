@@ -1,7 +1,7 @@
 addpath(genpath("utils"))
 
 % gravity terms
-g0 = 0.0;
+g0 = 9.81;
 g = g0*[0;-1;0];
 
 % robot kinematic parameters
@@ -37,10 +37,16 @@ k3 = 1;
 
 k = [k1;k2;k3];
 
+% viscous friction coefficients
+f1 = 0;
+f2 = 0;
+f3 = 0;
+
+friction = [f1;f2;f3];
 
 q = sym('q',[3,1]); assume(q,"real");
-qd = sym('qd',[3,1]); assume(qd,"real");
-qdd = sym('qdd',[3,1]); assume(qdd,"real");
+dq = sym('dq',[3,1]); assume(dq,"real");
+ddq = sym('ddq',[3,1]); assume(ddq,"real");
 u  = sym('u',[3,1]); assume(u,"real");
 
 table = [0 l1 0 q(1);
@@ -53,23 +59,23 @@ r = [d1 d2 d3; 0 0 0; 0 0 0];
 
 % initial state
 q0 = [0;0;0];
-qd0 = [0;0;0];
+dq0 = [0;0;0];
 theta0 = [0;0;0];
-thetad0 = [0;0;0];
+dtheta0 = [0;0;0];
 
 % set up simulation using euler lagrange ( do only once )
 
-[vc,om] = moving_frames(table,[0,0,0], r,q,qd) ;
+[vc,om] = moving_frames(table,[0,0,0], r,q,dq) ;
 
-[~,M] = kinM(vc,om,[m1;m2;m3],I,qd);
+[~,M] = kinM(vc,om,[m1;m2;m3],I,dq);
 
 invM = inv(M);
 
-c = christoffel(M,q,qd)*qd;
+c = christoffel(M,q,dq)*dq;
 gr = gravity_terms(m,g,r,T,q);
 
 % directDyn = (invM*(u-c-gr));
-directDyn = (M\(u-c-gr));
+qdd = (M\(u-c-gr));
 
 
 
@@ -81,4 +87,4 @@ directDyn = (M\(u-c-gr));
 
 open("RRR_rigid_joints")
 % https://it.mathworks.com/help/symbolic/generate-matlab-function-blocks.html
-matlabFunctionBlock("RRR_rigid_joints/euler_lagrange",directDyn,"vars",[u q qd])
+matlabFunctionBlock("RRR_rigid_joints/Direct Dynamics/euler_lagrange",qdd,"vars",[u q dq])
