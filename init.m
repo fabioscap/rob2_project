@@ -1,7 +1,7 @@
 addpath(genpath("utils"))
 
 % gravity terms
-g0 = 9.81;
+g0 = 0.0;
 g = g0*[0;-1;0];
 
 % robot kinematic parameters
@@ -26,9 +26,9 @@ d1 = -0.5;
 d2 = -0.5;
 d3 = -0.5;
 I = zeros(3,3,3);
-I(3,3,1) = 1;
-I(3,3,2) = 1;
-I(3,3,3) = 1; % non mi ricordo la formula dell'inerzia della sbarra
+I(3,3,1) = (1/12)*m(1)*l1*l1;
+I(3,3,2) = (1/12)*m(2)*l2*l2;
+I(3,3,3) = (1/12)*m(3)*l3*l3;
 
 % stiffness coefficients
 k1 = 1;
@@ -79,8 +79,6 @@ directDyn = (M\(u-c-gr));
 % -> change integrator blocks
 % -> change elastic force
 
-open("directRRR")
+open("RRR_rigid_joints")
 % https://it.mathworks.com/help/symbolic/generate-matlab-function-blocks.html
-matlabFunctionBlock("directRRR/euler_lagrange",directDyn,"vars",[u q qd])
-
-
+matlabFunctionBlock("RRR_rigid_joints/euler_lagrange",directDyn,"vars",[u q qd])
