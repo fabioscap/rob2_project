@@ -14,5 +14,6 @@ function [Ts, T] = DHplus(table)
         Ts = cat(3,Ts,A); % cat along third dimension
         T = T * A;
     end
+    T = simplify(T);
 end
 

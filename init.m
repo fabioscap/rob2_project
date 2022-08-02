@@ -1,7 +1,7 @@
 addpath(genpath("utils"))
 
 % gravity terms
-g0 = 9.81;
+g0 = 0;
 g = g0*[0;-1;0];
 
 % robot kinematic parameters
@@ -17,9 +17,9 @@ Im2 = 1;
 Im3 = 1;
 
 % robot dynamic parameters
-m1 = 1;
-m2 = 1;
-m3 = 1;
+m1 = 10;
+m2 = 7.5;
+m3 = 5;
 m = [m1;m2;m3];
 
 d1 = -0.5;
@@ -31,9 +31,9 @@ I(3,3,2) = (1/12)*m(2)*l2*l2;
 I(3,3,3) = (1/12)*m(3)*l3*l3;
 
 % stiffness coefficients
-k1 = 1;
-k2 = 1;
-k3 = 1;
+k1 = 1500;
+k2 = 1000;
+k3 = 500;
 
 k = [k1;k2;k3];
 
@@ -53,7 +53,7 @@ table = [0 l1 0 q(1);
          0 l2 0 q(2);
          0 l3 0 q(3)];
 
-T = DHplus(table);
+[T,dkin] = DHplus(table);
 
 r = [d1 d2 d3; 0 0 0; 0 0 0];
 
@@ -75,8 +75,10 @@ c = christoffel(M,q,dq)*dq;
 gr = gravity_terms(m,g,r,T,q);
 
 % directDyn = (invM*(u-c-gr));
-qdd = (M\(u-c-gr));
+ddq = (M\(u-c-gr));
 
+% directKin x y phi
+task = [dkin(1:2,4);q(1)+q(2)+q(3)];
 
 
 % TODO set up simulation using newton euler
@@ -87,4 +89,5 @@ qdd = (M\(u-c-gr));
 
 open("RRR_rigid_joints")
 % https://it.mathworks.com/help/symbolic/generate-matlab-function-blocks.html
-matlabFunctionBlock("RRR_rigid_joints/Direct Dynamics/euler_lagrange",qdd,"vars",[u q dq])
+matlabFunctionBlock("RRR_rigid_joints/Direct Dynamics/euler_lagrange",ddq,"vars",[u q dq])
+matlabFunctionBlock("RRR_rigid_joints/Direct Kinematics",task,"vars",q)
