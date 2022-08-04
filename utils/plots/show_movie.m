@@ -3,10 +3,9 @@ function show_movie(T,q,qout,thetaout,l)
     % TODO replace the loop with a timer to get real time playback
     % https://it.mathworks.com/matlabcentral/answers/396472-how-to-generate-an-event-in-matlab-every-second
     
-    % TODO plot also the thetas (maybe a small indicator on the joint)
-
     % plot a real time movie of the 3R planar robot given the simulation results
-    ax = axes('XLim',[-3 3],'YLim',[-3 3]); hold on;
+    lim = l(1)+l(2)+l(3)+0.5;
+    ax = axes('XLim',[-lim lim],'YLim',[-lim lim]); hold on;
     
     % resample time series in order to have fixed step samples
     step = 0.02;
@@ -15,24 +14,29 @@ function show_movie(T,q,qout,thetaout,l)
     qout = resample(qout,time);
     thetaout = resample(thetaout,time);
 
-    link1 = line([0 -l(1)],[0 0]);
-    link2 = line([0 -l(1)],[0 0]);
-    link3 = line([0 -l(3)],[0 0]);
+    link1 = line([0 -l(1)],[0 0],"LineWidth",5);
+    link2 = line([0 -l(1)],[0 0],"LineWidth",5);
+    link3 = line([-0.2 -l(3)],[0 0],"LineWidth",5);
     
+    % gripper
+    g1 = line([-0.2 -0.2],[-0.2 0.2],"LineWidth",5);
+    g2 = line([-0.25 0],[-0.2 -0.2],"LineWidth",5);
+    g3 = line([-0.25 0],[0.2 0.2],"LineWidth",5);
+
     % show the joints
-    j1 = plot(-l(1),0,"o","Color","g","MarkerSize",5);
-    j2 = plot(-l(2),0,"o","Color","g","MarkerSize",5);
-    j3 = plot(-l(3),0,"o","Color","g","MarkerSize",5);
+    j1 = plot(-l(1),0,"o","Color","g","MarkerSize",8);
+    j2 = plot(-l(2),0,"o","Color","g","MarkerSize",8);
+    j3 = plot(-l(3),0,"o","Color","g","MarkerSize",8);
 
     % show joint positions with a red marker
-    q1 = line([-l(1),-l(1)],[0,0.1],"Color","r");
-    q2 = line([-l(2),-l(2)],[0,0.1],"Color","r");
-    q3 = line([-l(3),-l(3)],[0,0.1],"Color","r");
+    q1 = line([-l(1),-l(1)],[0,0.3],"Color","r","LineWidth",2);
+    q2 = line([-l(2),-l(2)],[0,0.3],"Color","r","LineWidth",2);
+    q3 = line([-l(3),-l(3)],[0,0.3],"Color","r","LineWidth",2);
 
     % show theta positions with a black marker
-    theta1 = line([0, 0],[0,0.1],"Color","black");
-    theta2 = line([0,0],[0,0.1],"Color","black");
-    theta3 = line([0,0],[0,0.1],"Color","black");
+    theta1 = line([0,0],[0,0.3],"Color","black","LineWidth",2);
+    theta2 = line([0,0],[0,0.3],"Color","black","LineWidth",2);
+    theta3 = line([0,0],[0,0.3],"Color","black","LineWidth",2);
     
 
     tr1 = hgtransform('Parent',ax);
@@ -55,11 +59,16 @@ function show_movie(T,q,qout,thetaout,l)
     set(link3,'Parent',tr3);
     set(j3,'Parent',tr3);
     set(q3,'Parent',tr3);
-
+    
     tr3_theta = hgtransform('Parent',tr2);
     set(theta3,'Parent',tr3_theta);
 
-    
+    trgripper = hgtransform('Parent',tr3);
+    set(trgripper,'Matrix',makehgtform("translate",[0,0,0]))
+    set(g1,'Parent',trgripper);
+    set(g2,'Parent',trgripper);
+    set(g3,'Parent',trgripper);
+
     for i=1:length(time) 
 
         qi = qout.Data(i,:)';
