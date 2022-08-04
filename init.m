@@ -1,7 +1,7 @@
 addpath(genpath("utils"))
 
 % gravity terms
-g0 = 0;
+g0 = 9.81;
 g = g0*[0;-1;0];
 
 % robot kinematic parameters
@@ -74,7 +74,7 @@ invM = inv(M);
 c = christoffel(M,q,dq)*dq;
 gr = gravity_terms(m,g,r,T,q);
 
-% directDyn = (invM*(u-c-gr));
+% ddq = (invM*(u-c-gr)); 
 ddq = (M\(u-c-gr));
 
 % directKin x y phi
