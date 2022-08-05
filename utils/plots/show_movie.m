@@ -1,5 +1,5 @@
 function show_movie(T,q,qout,thetaout,l)
-
+    figure()
     % TODO replace the loop with a timer to get real time playback
     % https://it.mathworks.com/matlabcentral/answers/396472-how-to-generate-an-event-in-matlab-every-second
     

@@ -77,10 +77,6 @@ gr = gravity_terms(m,g,r,T,q);
 % ddq = (invM*(u-c-gr)); 
 ddq = (M\(u-c-gr));
 
-% directKin x y phi
-task = [dkin(1:2,4);q(1)+q(2)+q(3)];
-
-
 % TODO set up simulation using newton euler
 
 % TODO maybe wrap the state in [0;2pi)
@@ -90,4 +86,3 @@ task = [dkin(1:2,4);q(1)+q(2)+q(3)];
 open("RRR_rigid_joints")
 % https://it.mathworks.com/help/symbolic/generate-matlab-function-blocks.html
 matlabFunctionBlock("RRR_rigid_joints/Direct Dynamics/euler_lagrange",ddq,"vars",[u q dq])
-matlabFunctionBlock("RRR_rigid_joints/Direct Kinematics",task,"vars",q)

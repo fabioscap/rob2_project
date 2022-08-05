@@ -1,4 +1,4 @@
-function plot_time_series(ts,label,same_graph)
+function plot_time_series([ts],label)
     for i=1:size(ts.Data,2)
         if ~same_graph
             nexttile
