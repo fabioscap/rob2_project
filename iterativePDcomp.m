@@ -3,10 +3,7 @@ Kd = [600;300;300];
 qd = [pi/3;pi/3;-2*pi/3];
 
 outPD = sim("PD_elastic",30);
-
-
 outIT = sim('iterative_elastic',30);
-
 
 % plot a quantitative comparision of the two control algorithms
 figure()
