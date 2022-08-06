@@ -1,11 +1,12 @@
 function show_movie(T,q,qout,thetaout,errorout,l)
+        
     % plot a real time movie of the 3R planar robot given the simulation results
     lim = l(1)+l(2)+l(3)+0.5;
-    % use figure() instead, if you want to display the plot while making
-    % the video
+    % use figure() instead, if you want to display 
+    % the plot while making the video
     fig = figure('visible','off');
     ax = axes('Parent', fig, 'XLim',[-lim lim],'YLim',[-lim lim]); hold on;
-    set(ax, 'Visible', 'off');
+    % set(ax, 'Visible', 'off');
     % resample time series in order to have fixed step samples
     step = 0.0333333333; % 30 FPS
     time = [0:step:qout.Time(end)];
