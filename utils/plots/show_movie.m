@@ -4,7 +4,7 @@ function show_movie(T,q,qout,thetaout,errorout,l)
     lim = l(1)+l(2)+l(3)+0.5;
     % use figure() instead, if you want to display 
     % the plot while making the video
-    fig = figure('visible','off');
+    fig = figure('Position',[100 100 1120 840],'visible','off');
     ax = axes('Parent', fig, 'XLim',[-lim lim],'YLim',[-lim lim]); hold on;
     % set(ax, 'Visible', 'off');
     % resample time series in order to have fixed step samples
@@ -74,7 +74,7 @@ function show_movie(T,q,qout,thetaout,errorout,l)
     % Let's make the video
     t = strrep(string(datetime('now'))," ","-");
     v = VideoWriter("animations/experimen-"+t+".avi",'Motion JPEG AVI');
-    v.Quality = 95; %95
+    v.Quality = 75; % 50 or lower is enough for tests, better 95-100 for sharing purposes.
     framerate = round(1/step);
     v.FrameRate = framerate;
     open(v);
