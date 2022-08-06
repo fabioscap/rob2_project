@@ -1,18 +1,18 @@
-function show_movie(T,q,qout,thetaout,l)
-    figure()
-    % TODO replace the loop with a timer to get real time playback
-    % https://it.mathworks.com/matlabcentral/answers/396472-how-to-generate-an-event-in-matlab-every-second
-    
+function show_movie(T,q,qout,thetaout,errorout,l)
     % plot a real time movie of the 3R planar robot given the simulation results
     lim = l(1)+l(2)+l(3)+0.5;
-    ax = axes('XLim',[-lim lim],'YLim',[-lim lim]); hold on;
-    
+    % use figure() instead, if you want to display the plot while making
+    % the video
+    fig = figure('visible','off');
+    ax = axes('Parent', fig, 'XLim',[-lim lim],'YLim',[-lim lim]); hold on;
+    set(ax, 'Visible', 'off');
     % resample time series in order to have fixed step samples
-    step = 0.02;
+    step = 0.0333333333; % 30 FPS
     time = [0:step:qout.Time(end)];
     
     qout = resample(qout,time);
     thetaout = resample(thetaout,time);
+    errorout = resample(errorout, time);
 
     link1 = line([0 -l(1)],[0 0],"LineWidth",5);
     link2 = line([0 -l(1)],[0 0],"LineWidth",5);
@@ -68,12 +68,19 @@ function show_movie(T,q,qout,thetaout,l)
     set(g1,'Parent',trgripper);
     set(g2,'Parent',trgripper);
     set(g3,'Parent',trgripper);
+    
 
+    % Let's make the video
+    t = strrep(string(datetime('now'))," ","-");
+    v = VideoWriter("animations/experimen-"+t+".avi",'Motion JPEG AVI');
+    v.Quality = 95; %95
+    framerate = round(1/step);
+    v.FrameRate = framerate;
+    open(v);
+    disp("Start saving video...")
     for i=1:length(time) 
-
         qi = qout.Data(i,:)';
         thetai = thetaout.Data(i,:)';
-
         Ti = double(subs(T,q,qi));
 
         set(tr1,'Matrix',Ti(:,:,1));
@@ -83,8 +90,15 @@ function show_movie(T,q,qout,thetaout,l)
 
         set(tr2,'Matrix',Ti(:,:,2));
         set(tr3,'Matrix',Ti(:,:,3));
-        
-        drawnow
+        frame = getframe(fig);
+        writeVideo(v,frame);
+        % drawnow
+        % if the error norm is very low we can stop the video.
+        if norm(errorout.Data(i,:))<1e-3
+            break
+        end
     end
+    close(v);
+    disp("...video saved")
 end
 
