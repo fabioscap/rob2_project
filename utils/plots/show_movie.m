@@ -1,10 +1,8 @@
-function show_movie(T,q,qout,thetaout,errorout,l)
-        
-    % plot a real time movie of the 3R planar robot given the simulation results
+function show_movie(T,q,qout,thetaout,errorout,l,visibility, quality)
+    % plot/save a real time movie of the 3R planar robot given the simulation results
     lim = l(1)+l(2)+l(3)+0.5;
-    % use figure() instead, if you want to display 
-    % the plot while making the video
-    fig = figure('Position',[100 100 1120 840],'visible','off');
+
+    fig = figure('Position',[100 100 1120 841],'visible',visibility);
     ax = axes('Parent', fig, 'XLim',[-lim lim],'YLim',[-lim lim]); hold on;
     % set(ax, 'Visible', 'off');
     % resample time series in order to have fixed step samples
@@ -16,7 +14,7 @@ function show_movie(T,q,qout,thetaout,errorout,l)
     errorout = resample(errorout, time);
 
     link1 = line([0 -l(1)],[0 0],"LineWidth",5);
-    link2 = line([0 -l(1)],[0 0],"LineWidth",5);
+    link2 = line([0 -l(2)],[0 0],"LineWidth",5);
     link3 = line([-0.2 -l(3)],[0 0],"LineWidth",5);
     
     % gripper
@@ -74,7 +72,7 @@ function show_movie(T,q,qout,thetaout,errorout,l)
     % Let's make the video
     t = strrep(string(datetime('now'))," ","-");
     v = VideoWriter("animations/experimen-"+t+".avi",'Motion JPEG AVI');
-    v.Quality = 75; % 50 or lower is enough for tests, better 95-100 for sharing purposes.
+    v.Quality = quality; % 50 or lower is enough for tests, better 95-100 for sharing purposes.
     framerate = round(1/step);
     v.FrameRate = framerate;
     open(v);
@@ -93,13 +91,14 @@ function show_movie(T,q,qout,thetaout,errorout,l)
         set(tr3,'Matrix',Ti(:,:,3));
         frame = getframe(fig);
         writeVideo(v,frame);
-        % drawnow
+        drawnow
         % if the error norm is very low we can stop the video.
         if norm(errorout.Data(i,:))<1e-3
             break
         end
     end
     close(v);
+    close(fig);
     disp("...video saved")
 end
 

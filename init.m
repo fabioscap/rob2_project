@@ -57,12 +57,6 @@ table = [0 l1 0 q(1);
 
 r = [d1 d2 d3; 0 0 0; 0 0 0];
 
-% initial state
-q0 = [0;0;0];
-dq0 = [0;0;0];
-theta0 = [0;0;0];
-dtheta0 = [0;0;0];
-
 % set up simulation using euler lagrange ( do only once )
 
 [vc,om] = moving_frames(table,[0,0,0], r,q,dq) ;
@@ -77,12 +71,23 @@ gr = gravity_terms(m,g,r,T,q);
 % ddq = (invM*(u-c-gr)); 
 ddq = (M\(u-c-gr));
 
-% TODO set up simulation using newton euler
-
-% TODO maybe wrap the state in [0;2pi)
-% -> change integrator blocks
-% -> change elastic force
-
 open("RRR_rigid_joints")
 % https://it.mathworks.com/help/symbolic/generate-matlab-function-blocks.html
 matlabFunctionBlock("RRR_rigid_joints/Direct Dynamics/euler_lagrange",ddq,"vars",[u q dq])
+
+%% state and regulation parameters
+% you can fine-tune launching only this part of the file ctrl+send
+% initial state
+q0 = [-pi/2;0;0];
+% theta0 at steady state is related to q0 by:
+theta0 = double(diag(k)^-1*subs(gr,q,q0)+q0);
+
+dq0 = [0;0;0];
+dtheta0 = [0;0;0];
+
+% gain matrices
+Kp = [400;450;400];
+Kd = [300; 300;350];
+
+% desired set-point
+qd = [pi/4;pi/2;pi/2];
