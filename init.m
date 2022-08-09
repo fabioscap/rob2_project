@@ -30,13 +30,6 @@ I(3,3,1) = (1/12)*m(1)*l1*l1;
 I(3,3,2) = (1/12)*m(2)*l2*l2;
 I(3,3,3) = (1/12)*m(3)*l3*l3;
 
-% stiffness coefficients
-k1 = 1500;
-k2 = 1000;
-k3 = 500;
-
-k = [k1;k2;k3];
-
 % viscous friction coefficients
 f1 = 0;
 f2 = 0;
@@ -77,6 +70,17 @@ matlabFunctionBlock("RRR_rigid_joints/Direct Dynamics/euler_lagrange",ddq,"vars"
 
 %% state and regulation parameters
 % you can fine-tune launching only this part of the file ctrl+send
+
+gamma = 3;
+beta = (gamma-2)/(2*gamma);
+
+% stiffness coefficients
+k1 = 6500;
+k2 = 4000;
+k3 = 4000;
+
+k = [k1;k2;k3];
+
 % initial state
 q0 = [-pi/2;0;0];
 % theta0 at steady state is related to q0 by:
@@ -86,8 +90,8 @@ dq0 = [0;0;0];
 dtheta0 = [0;0;0];
 
 % gain matrices
-Kp = [400;450;400];
-Kd = [300; 300;350];
+Kp = [400;400;400];
+Kd = [400;400;350];
 
 % desired set-point
-qd = [pi/4;pi/2;pi/2];
+qd = [pi/4;0;0];
