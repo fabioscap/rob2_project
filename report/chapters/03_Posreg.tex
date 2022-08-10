@@ -1,0 +1,126 @@
+\section{Elastic Joint Robots: Position Regulation}
+As premised, to reach the same performances of rigid case we need a bigger effort on control design. We'll focus our attention on the classical formulation (\ref{eq:reduced}): neglecting the dissipation effects that always help regularizing. In particular working on a 3R planar arm in the vertical plane, so under gravity ($\implies$ g(q) not always zero). 
+\subsection{PID limitations}
+As stated in \cite{deluca93}, given an exact knowledge of the gravity vector, it's possible to asymptotically stabilize also this kind of robots using a proportional-derivative law \cite{simplepd}. However this is difficult to assume, for example in picking-up tasks where an on-line identification would be required. A standard approach is to use a PID, consisting of an integral term in addition to the linear PD law, for (unknown) gravity compensation. Unluckily there is no formal proof of global convergence, the result holds only locally around the desired configuration, it's mathematically complex due to the nonlinear nature of the robot and, commonly, saturation will occur during large transient phases.
+\subsection{Iterative Scheme}
+To achieve set-point regulation of the robot end-effector we have implemented the iterative one-stage scheme proposed in \cite{deluca96}, which is based on the idea of using a simple PD control loop at motor level and two update rules for learning the correct compensation at the desired point:
+\begin{equation}\label{eq:clow}
+    u(t) = \frac{1}{\beta}K_P(\theta_{d,i-1}-\theta(t))-K_D\dot{\theta}+u_{i-1}
+\end{equation}
+\begin{equation}\label{eq:u_up}
+    u_i = \frac{1}{\beta}K_P(\theta_{d,i-1}-\theta_i) + u_{i-1}
+\end{equation}
+\begin{equation}\label{eq:mot_up}
+    \theta_{d,i} = \theta_i + (q_d - q_i)
+\end{equation}
+where $\pmb{K_P}$ and $\pmb{K_D}$ are positive definite gain matrices, the subscript \(\pmb{i}\) indicates the equilibrium reached at steady state at iteration i, $\pmb{u_{i-1}}$ a constant feed-forward $u_0=0$ usually and $\pmb{\theta_{d,i-1}}$ the current estimate of the a priori unknown desired motor position, its most correct initialization is the desired tip position if the arm were fully rigid. \\ On the wake of \cite{simplepd,13sic} that solve this problem provided exact gravity compensation, we are working with motor quantities; instead of adopting exclusively link variables that result in performance limit. In elastic joint robots not only the feed-forward term need an iterative update, but also the motor desired position, what reflect the rigid case is that g(q) contains only trigonometric and/or linear terms in q, so the usual structural property holds:
+\begin{equation}\label{eq:stprop}
+    \pmb{\exists \alpha>0}: \norm{\frac{\partial^2U}{\partial q^2}}=\norm{\frac{\partial g}{\partial q}} \leq \alpha, \forall q
+\end{equation}
+The goal is to bring the robot to a desired configuration (\(q=q_d\), \(\dot q = 0\), \(\ddot q = 0\)) while acting on the motor variables \(\theta\). In absence of gravity, it is straightforward to say that \(\theta_d = q_d\), because you want the motors and the links to be in the same position. Otherwise, in presence of gravity effects, it is necessary to account for an offset which generates an elastic force that balances the gravity. This can be easily understood by considering the single spring mass equation, where a mass oscillates along a reference position \(\theta\) in the presence of gravity:
+\[
+    m\ddot q + k(q-\theta) = mg
+\]
+At steady state, we have the configuration \(q^* = \frac{mg}{k} +\theta\). If we want to reach \(q_d\) we need to balance the offset in the reference position, so that:
+\[
+    \theta_d = q_d - \frac{mg}{k}
+\]
+%To compute this offset for the robot, it is required knowledge about the stiffness of the joints \(K\) and \(g(q)\). 
+In the iterative control law, we estimate both the gravity term \(g(q_d)\) and \(\theta_d\) at the same time, \textbf{without knowing a single detail about the robot}. The downside of this approach is that we need another sensor for each joint, either to measure \(q\) or the displacement \(\delta = \theta - q\) directly. Note that in theory, after waiting infinite time needed for exact convergence, if you know K and g (which is the equal to the control effort read at the end of each iteration in our method) you could relate $\theta$ and q at steady state from the first equation of (\ref{eq:reduced}): $\theta = K^{-1}g(q)+q$.
+\subsubsection{Proof of convergence}\label{sec:introduction}
+% show convergence of PD + approximate gravity compensation for
+% elastic joints
+In this subsection we will show how the link position, exploiting the control law (\ref{eq:clow}) with updates (\ref{eq:u_up}) and (\ref{eq:mot_up}), globally converges to \(q = q_d\), provided that these four (sufficient) assumptions are satisfied:
+\begin{enumerate}[a)]
+    \item \(\lambda_{min}(K) > \gamma \alpha\)
+    \item \(\lambda_{min}(K_P) > \alpha\) 
+    \item \(\gamma > 2\)
+    \item \(0 < \beta < \frac{\gamma-2}{2\gamma}\)
+\end{enumerate}
+\begin{proof}
+Foremost we define the variables $\pmb{\delta_i}$, displacement between motor and link at steady state, and  $\pmb{e_i}$, steady state error at motor level, as:
+\begin{equation} \label{eq:delta}
+\delta_i = q_i - \theta_i 
+\end{equation}
+\begin{equation} \label{eq:error}
+e_i = \theta_{d,i-1}-\theta_i
+\end{equation}
+Let's start proving that: \\
+{\centering\compress
+\begin{tabularx}{\linewidth}{>{\leqnomode}XX}
+\begin{equation} \label{eq:etozero}
+\|e_i\|\to 0
+\end{equation}
+& 
+\begin{equation} \label{eq:deltatozero}
+\|\Delta\theta_{d,i}\| = \|\theta_{d,i}-\theta_{d,i-1}\|\to 0
+\end{equation}
+\end{tabularx}}
+At steady state, from the model equations (\ref{eq:reduced}) and (\ref{eq:u_up}) you have: \\
+\begin{equation}\label{eq:giui}
+    g(q_i) = -K\delta_i= u_i = \frac{K_P}{\beta}(\theta_{d,i}-\theta_i) + u_{i-1}  
+\end{equation}
+From (\ref{eq:giui}) with (\ref{eq:stprop}) and (\ref{eq:delta}), exploiting the triangle inequality, follows that:
+\begin{equation}\label{eq:gandq}
+\|u_i-u_{i-1}\| = \|g(q_i)-g(q_{i-1})\| \leq \alpha \|q_i-q_{i-1}\|
+\leq\alpha(\|\theta_i-\theta_{i-1}\|+\|\delta_i-\delta_{i-1}\|)
+\end{equation}
+Using (\ref{eq:giui}), (\ref{eq:gandq}) and assumption a):
+\[
+    \| \delta_i - \delta_{i-1} \| \leq \|K^{-1}\| \|g(q_i)-g(q_{i-1})\|< \frac{\alpha}{\gamma \alpha}\| q_i - q_{i-1} \| \leq\frac{1}{\gamma}(\|\theta_i-\theta_{i-1}\|+\|\delta_i-\delta_{i-1}\|)
+\]
+then
+\begin{equation}\label{eq:delte}
+    \| \delta_i - \delta_{i-1} \| < \frac{1}{\gamma-1}\|\theta_i-\theta_{i-1}\|
+\end{equation}
+Combining (\ref{eq:gandq}) and (\ref{eq:delte}) recalling (\ref{eq:error}):
+\[
+ \|u_i-u_{i-1}\| < \frac{\gamma\alpha}{\gamma-1}\|\theta_i-\theta_{i-1}\|
+ = \frac{\gamma\alpha}{\gamma-1}\|-e_i + e_{i-1} + \theta_{d,i-1}-\theta_{d,i-2}\|
+\]
+noting that \(u_i-u_{i-1} = \frac{K_P}{\beta} e_i \)
+
+\[
+    \frac{1}{\beta} \|K_P e_i \| <  
+    \frac{\gamma\alpha}{\gamma-1}(\|e_i \|+ \|e_{i-1}\| + \|\Delta\theta_{d,i-1}\|)
+\]
+which, together with assumption b), generates the following inequality for the error: 
+
+\begin{equation} \label{eq:e_ineq}
+    \|e_i\| < \frac{\gamma\beta}{\gamma-1-\gamma\beta}(\|e_{i-1}\|+\|\Delta\theta_{d,i-1}\|)
+\end{equation}
+To find a similar result for \(\Delta\theta_{d,i}\), thanks to (\ref{eq:delte}) we show that:
+\[
+ \|\Delta\theta_{d,i}\| = \|\delta_i - \delta_{i-1}\| < \frac{1}{\gamma-1}\|\theta_i-\theta_{i-1}\| \leq \frac{1}{\gamma-1}(\|e_i \|+ \|e_{i-1}\| + \|\Delta\theta_{d,i-1}\|)
+\]
+and involving (\ref{eq:e_ineq})
+\begin{equation} \label{eq:dtheta_ineq}
+    \|\Delta\theta_{d,i}\|  <\frac{1}{\gamma-1-\gamma\beta}(\|e_{i-1}\|+\|\Delta\theta_{d,i-1}\|)
+\end{equation}
+Combining (\ref{eq:e_ineq}) and (\ref{eq:dtheta_ineq}) you get the set of inequalities:
+\begin{equation}
+    \begin{pmatrix}\|e_i\|\\ \|\Delta\theta_{d,i}\|\end{pmatrix} < \frac{1}{\gamma-1-\gamma\beta}\begin{pmatrix}\gamma\beta & \gamma\beta \\ 1 & 1\end{pmatrix}\begin{pmatrix}\|e_{i-1}\|\\ \|\Delta\theta_{d,i-1}\|\end{pmatrix}
+\end{equation}
+It follows that \( \|e_i\| < \|e_{i-1}\| \) and \( \|\Delta\theta_{d,i}\|<\|\Delta\theta_{d,i-1}\|\), i.e. we have a contraction mapping, iff the matrix:
+\[
+    \frac{1}{\gamma-1-\gamma\beta}\begin{pmatrix}\gamma\beta & \gamma\beta \\ 1 & 1\end{pmatrix}
+\]
+has eigenvalues strictly inside the unit circle. One of them is obviously zero, the other one is \( \frac{\gamma\beta +1}{\gamma-1-\gamma\beta}\), which is lower than 1 if assumption d) is valid. Assumption c) under the hood has allowed to keep the right sign of inequalities completing the proof for (\ref{eq:etozero}) and (\ref{eq:deltatozero}). 
+At the limit \(i\to\infty\), since (\ref{eq:etozero}) must be true:
+\begin{equation*}
+    \theta_{d,i-1}=\theta_i
+\end{equation*}
+that with (\ref{eq:mot_up}) yields:
+\begin{equation*}
+    \theta_{d,i} - \theta_{d,i-1} = q_d - q_i
+\end{equation*}
+eventually for (\ref{eq:deltatozero}) in this situation:
+\begin{equation}
+    q_d = q_i
+\end{equation}
+Where \(q_i\) is the equilibrium reached at steady state after iteration i. \end{proof}
+~
+\\
+The assumptions for this proof guarantee also that the steady state reached during each iteration is unique \cite{deluca93} and it, together with its existence, can be proven through a classical Lyapunov argument similarly to \cite{simplepd, pdstable}, being each step of this iterative procedure interpreted as a PD with constant approximate gravity compensation FFW.
+
+
