@@ -1,6 +1,6 @@
-%% state and regulation parameters
-% you can fine-tune launching only this part of the file ctrl+send
+close all
 
+iteration_period = 3;
 gamma = 35;
 beta = 0.47;
 
@@ -36,8 +36,11 @@ plot(out.error.Time,out.error.Data(:,2),"DisplayName","error "+2); hold on;
 plot(out.error.Time,out.error.Data(:,3),"DisplayName","error "+3); hold on;
 xlabel("time -sec-")
 ylabel("error -rad-")
+xlim([0;12])
+ylim([-0.6;2.5])
+xline(iteration_period:iteration_period:12,'--','HandleVisibility','off');
 legend()
-grid;
+%grid;
 
 % plot q/theta
 figure()
@@ -50,8 +53,9 @@ for i=1:3
     xlabel("time -sec-")
     ylabel("angle -rad-")
     xlim([0;12])
-    ylim([-pi;pi])
-    grid;
+    ylim([-2;2])
+    xline(iteration_period:iteration_period:12,'--','HandleVisibility','off');
+    %grid;
 end
 
 % plot control effort
@@ -61,7 +65,8 @@ plot(out.error.Time,out.u.Data(:,2),"DisplayName","u"+2); hold on;
 plot(out.error.Time,out.u.Data(:,3),"DisplayName","u"+3); hold on;
 xlabel("time -sec-")
 ylabel("torque -Nm-")
-ylim([-850 850])
+ylim([-850 1100])
 xlim([0 12])
+xline(iteration_period:iteration_period:12,'--','HandleVisibility','off');
 legend()
-grid;
+%grid;

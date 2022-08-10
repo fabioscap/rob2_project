@@ -1,5 +1,4 @@
 addpath(genpath("utils"))
-
 % gravity terms
 g0 = 9.81;
 g = g0*[0;-1;0];
@@ -70,7 +69,7 @@ matlabFunctionBlock("RRR_rigid_joints/Direct Dynamics/euler_lagrange",ddq,"vars"
 
 %% state and regulation parameters
 % you can fine-tune launching only this part of the file ctrl+send
-
+iteration_period = 5;
 gamma = 3.01;
 beta = 1/6;
 
