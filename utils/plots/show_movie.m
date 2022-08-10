@@ -2,7 +2,7 @@ function show_movie(T,q,qout,thetaout,errorout,l,visibility, quality)
     % plot/save a real time movie of the 3R planar robot given the simulation results
     lim = l(1)+l(2)+l(3)+0.5;
 
-    fig = figure('Position',[100 100 1120 841],'visible',visibility);
+    fig = figure('visible',visibility);
     ax = axes('Parent', fig, 'XLim',[-lim lim],'YLim',[-lim lim]); hold on;
     % set(ax, 'Visible', 'off');
     % resample time series in order to have fixed step samples

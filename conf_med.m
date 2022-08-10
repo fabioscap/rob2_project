@@ -1,13 +1,14 @@
 close all
 
 iteration_period = 3;
-gamma = 3.01;
-beta = 1/6;
+iterations = iteration_period:iteration_period:30;
+gamma = 5;
+beta = 0.3;
 
 % stiffness coefficients
-k1 = 2500;
-k2 = 2000;
-k3 = 1050;
+k1 = 2100;
+k2 = 4500;
+k3 = 1500;
 
 k = [k1;k2;k3];
 
@@ -20,11 +21,12 @@ dq0 = [0;0;0];
 dtheta0 = [0;0;0];
 
 % gain matrices
-Kp = [600;500;400];
-Kd = [200;200;200];
+Kp = [200;200;200];
+Kd = [150;150;150];
 
 % desired set-point
 qd = [pi/4;0;pi/2];
+%qd = [0;0;0];
 
 out = sim('iterative_elastic',30);
 
@@ -36,7 +38,7 @@ plot(out.error.Time,out.error.Data(:,3),"DisplayName","error "+3); hold on;
 xlabel("time -sec-")
 ylabel("error -rad-")
 legend()
-grid;
+xline(iterations,'--','HandleVisibility','off');
 
 % plot q/theta
 figure()
@@ -48,9 +50,8 @@ for i=1:3
     legend('Location','SouthEast');
     xlabel("time -sec-")
     ylabel("angle -rad-")
-    xlim([0;12])
     ylim([-pi;pi])
-    grid;
+    xline(iterations,'--','HandleVisibility','off');
 end
 
 % plot control effort
@@ -60,10 +61,9 @@ plot(out.error.Time,out.u.Data(:,2),"DisplayName","u"+2); hold on;
 plot(out.error.Time,out.u.Data(:,3),"DisplayName","u"+3); hold on;
 xlabel("time -sec-")
 ylabel("torque -Nm-")
-ylim([-850 850])
-xlim([0 30])
+ylim([-400 1000])
 legend()
-grid;
+xline(iterations,'--','HandleVisibility','off');
 
 grqd = eval(subs(gr,q,qd));
 % plot gravity compensation
@@ -74,7 +74,8 @@ for i=1:3
     plot(out.ffw.Time,out.ffw.Data(:,i),"DisplayName","ffw"+i); hold on;
     plot(out.ffw.Time,grqd(i)*ones(1,length(out.theta.Time)),"DisplayName","grav"+i,"LineStyle","- -");
     legend('Location','SouthEast');
-    grid;
+    ylim([-100 300])
+    xline(iterations,'--','HandleVisibility','off');
 end
 
 grqd = eval(subs(gr,q,qd));
@@ -86,7 +87,20 @@ for i=1:3
     plot(out.thetaref.Time,out.thetaref.Data(:,i),"DisplayName","thetaref"+i); hold on;
     plot(out.thetaref.Time,qd(i)*ones(1,length(out.thetaref.Time)),"DisplayName","qd"+i,"LineStyle","- -");
     legend('Location','SouthEast');
-    grid;
-    ylim([qd(i)-0.1;qd(i)+0.1])
+    xline(iterations,'--','HandleVisibility','off');
+    ylim([qd(i)-0.2;qd(i)+0.2])
 end
-
+% we update Kp is such a way that it's possible to see how the first
+% iteration equal for both methods
+Kp=Kp/beta;
+outPD = sim("PD_elastic",30);
+figure()
+pd_e_norm = vecnorm(outPD.error.Data,2,2);
+it_e_norm = vecnorm(out.error.Data,2,2);
+plot(outPD.error.Time,pd_e_norm,"DisplayName","PD error"); hold on;
+plot(out.error.Time,it_e_norm,"DisplayName","iterative error"); hold on;
+legend()
+xline(iterations,'--','HandleVisibility','off');
+xlabel("time -sec-")
+ylim([-0.5;3])
+ylabel("error -rad-") 
