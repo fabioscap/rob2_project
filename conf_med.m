@@ -52,7 +52,7 @@ for i=1:3
     legend('Location','SouthEast');
     xlabel("time -sec-")
     ylabel("angle -rad-")
-    xlim([0;12])
+     
     xline(iteration_period:iteration_period:30,'--','HandleVisibility','off');
     %grid;
 end
@@ -63,7 +63,7 @@ for i=1:3
     legend('Location','SouthEast');
     xlabel("time -sec-")
     ylabel("angle -rad-")
-    xlim([0;12])
+     
     xline(iteration_period:iteration_period:30,'--','HandleVisibility','off');
     %grid;
 end
@@ -171,7 +171,7 @@ for i=1:3
     legend('Location','SouthEast');
     xlabel("time -sec-")
     ylabel("angle -rad-")
-    xlim([0;12])
+     
     xline(iteration_period:iteration_period:30,'--','HandleVisibility','off');
     %grid;
 end
@@ -182,7 +182,7 @@ for i=1:3
     legend('Location','SouthEast');
     xlabel("time -sec-")
     ylabel("angle -rad-")
-    xlim([0;12])
+     
     xline(iteration_period:iteration_period:30,'--','HandleVisibility','off');
     %grid;
 end
