@@ -30,10 +30,10 @@ qd = [pi/4;0;pi/2];
 out = sim('iterative_elastic',30);
 
 % plot error
-figure()
-plot(out.error.Time,out.error.Data(:,1),"DisplayName","error "+1); hold on;
-plot(out.error.Time,out.error.Data(:,2),"DisplayName","error "+2); hold on;
-plot(out.error.Time,out.error.Data(:,3),"DisplayName","error "+3); hold on;
+figure(1)
+plot(out.error.Time,out.error.Data(:,1),"DisplayName","error "+1,"LineWidth",2); hold on;
+plot(out.error.Time,out.error.Data(:,2),"DisplayName","error "+2,"LineWidth",2); hold on;
+plot(out.error.Time,out.error.Data(:,3),"DisplayName","error "+3,"LineWidth",2); hold on;
 xlabel("time -sec-")
 ylabel("error -rad-")
 xlim([0;12])
@@ -41,28 +41,38 @@ ylim([-0.6;2.5])
 xline(iteration_period:iteration_period:12,'--','HandleVisibility','off');
 legend()
 %grid;
-
 % plot q/theta
-figure()
-tiledlayout(3,1)
+figure(2)
+tiledlayout(2,1)
+% for the high stiffness configuration, we plot separately q and delta
+% because they are hard to distinguish
+nexttile
 for i=1:3
-    nexttile
-    plot(out.q.Time,out.q.Data(:,i),"DisplayName","q"+i,"Color","b"); hold on;
-    plot(out.theta.Time,out.theta.Data(:,i),"DisplayName","theta"+i,"Color","r");
+    plot(out.theta.Time,out.theta.Data(:,i),"DisplayName","theta"+i,"LineWidth",2); hold on;
     legend('Location','SouthEast');
     xlabel("time -sec-")
     ylabel("angle -rad-")
     xlim([0;12])
-    ylim([-2;2])
+    xline(iteration_period:iteration_period:12,'--','HandleVisibility','off');
+    %grid;
+end
+nexttile
+out.delta = out.q - out.theta;
+for i=1:3
+    plot(out.delta.Time,out.delta.Data(:,i),"DisplayName","delta"+i,"LineWidth",2); hold on;
+    legend('Location','SouthEast');
+    xlabel("time -sec-")
+    ylabel("angle -rad-")
+    xlim([0;12])
     xline(iteration_period:iteration_period:12,'--','HandleVisibility','off');
     %grid;
 end
 
 % plot control effort
-figure()
-plot(out.error.Time,out.u.Data(:,1),"DisplayName","u"+1); hold on;
-plot(out.error.Time,out.u.Data(:,2),"DisplayName","u"+2); hold on;
-plot(out.error.Time,out.u.Data(:,3),"DisplayName","u"+3); hold on;
+figure(3)
+plot(out.error.Time,out.u.Data(:,1),"DisplayName","u"+1,"LineWidth",2); hold on;
+plot(out.error.Time,out.u.Data(:,2),"DisplayName","u"+2,"LineWidth",2); hold on;
+plot(out.error.Time,out.u.Data(:,3),"DisplayName","u"+3,"LineWidth",2); hold on;
 xlabel("time -sec-")
 ylabel("torque -Nm-")
 ylim([-850 1100])
@@ -70,3 +80,7 @@ xlim([0 12])
 xline(iteration_period:iteration_period:12,'--','HandleVisibility','off');
 legend()
 %grid;
+
+saveas(1,"figures/1_1_error.eps","epsc")
+saveas(2,"figures/1_1_thetadelta.eps","epsc")
+saveas(3,"figures/1_1_effort.eps","epsc")
