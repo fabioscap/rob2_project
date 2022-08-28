@@ -3,29 +3,29 @@ To accurately model the elastic joints some standard assumptions are needed, we'
 described in \cite{13sic} \textit{section 13.1.1} and summarized in Figure~\ref{fig:assumpt}, so as to ensure long life of electrical drives, linear elasticity, decoupling and independence properties.
 % want more details?
 \subsection{Reduced Model}
-In contrast with the rigid robot, here there is a displacement between motor and link frames, this requires to take into account 2N moving rigid bodies. Hence, a very convenient choice is the use of 2N generalized coordinates, N for the link \textbf{q} and N for the motor $\boldsymbol{\theta}$ positions. Paying attention to the fact that the rotors contribute to the kinetic energy and the joint deflections add an elastic component to the total potential energy, the usual Euler-Lagrange method can be applied 
+In contrast with the rigid robot, here there is a displacement between motor and link frames, this requires to take into account $2N$ moving rigid bodies. Hence, a very convenient choice is the use of $2N$ generalized coordinates, $N$ for the link $\qv$ and $N$ for the motor $\thetav$ positions. Paying attention to the fact that the rotors contribute to the kinetic energy and the joint deflections add an elastic component to the total potential energy, the usual Euler-Lagrange method can be applied 
 yielding:
 \begin{equation} \label{eq:reduced}
     \begin{pmatrix} 
-    M(q)\Ddot{q}+c(q,\Dot{q})+g(q)+K(q-\theta)\\ B\Ddot{\theta}+K(\theta-q) 
+    \Mm\!(\qv)\ddqv+\cv(\qv,\dqv)+\gv(\qv)+\Km(\qv-\thetav)\\ \Bm\ddthetav+\Km(\thetav-\qv) 
     \end{pmatrix} 
     =
-    \begin{pmatrix} 0 \\ u \end{pmatrix}
+    \begin{pmatrix} \zerov \\ \uv \end{pmatrix}
 \end{equation}
-where \textbf{B} is the constant diagonal inertia matrix collecting the rotors inertial components around their spinning axes, \textbf{M(q)} is the sum of the link inertia matrix $M_L$ and $M_R$ which contains the rotor masses and the other rotor components, and \textbf{K} $>0$ the diagonal matrix of joint stiffness. (\ref{eq:reduced}) is also known as reduced model.
+where $\Bm$ is the constant diagonal inertia matrix collecting the rotors inertial components around their spinning axes, $\Mm\!(\qv)$ is the sum of the link inertia matrix $\Mm_{\!L}$ and $\Mm_{\!R}$ which contains the rotor masses and the other rotor components, and $\Km$ $>\zerov$ the diagonal matrix of joint stiffness. Equations~(\ref{eq:reduced}) are also known as reduced model.
 \subsection{Complete Model}
-Removing the simplification, we have to consider also the inertial couplings between the rotors and the previous links in the robot chain under the square matrix \textbf{S(q)}, attaining the complete dynamic model:
+Removing the simplification, we have to consider also the inertial couplings between the rotors and the previous links in the robot chain under the square matrix $\Sm(\qv)$, attaining the complete dynamic model:
 \begin{equation}\label{eq:completemod}
-    \begin{pmatrix}M(q)~S(q)\\ S^T(q)~B\end{pmatrix}
-    \begin{pmatrix}\Ddot{q}\\ \Ddot{\theta}\end{pmatrix} +
-    \begin{pmatrix}c(q,\Dot{q})+c_1(q,\Dot{q},\Dot{\theta})\\ c_2(q,\Dot{q})\end{pmatrix} +
-    \begin{pmatrix}g(q)+K(q-\theta)\\ K(\theta-q)\end{pmatrix} =
-    \begin{pmatrix} 0 \\ u \end{pmatrix}
+    \begin{pmatrix}\Mm\!(\qv)~\Sm(\qv)\\ \Sm^T\!(\qv)~\Bm\end{pmatrix}
+    \begin{pmatrix}\ddqv\\ \ddthetav\end{pmatrix} +
+    \begin{pmatrix}\cv(\qv,\dqv)+\cv_1(\qv,\dqv,\dthetav)\\ \dcv_2(\qv,\dqv)\end{pmatrix} +
+    \begin{pmatrix}\gv(\qv)+\Km(\qv-\thetav)\\ \Km(\thetav-\qv)\end{pmatrix} =
+    \begin{pmatrix} \zerov \\ \uv \end{pmatrix}
 \end{equation}
-moreover in presence of energy-dissipating effects, the non-conservative generalized forces appear on the right side of (\ref{eq:completemod}), for example viscous friction \textbf{F} of the transmissions and spring damping \textbf{D} of the joints \small{(both matrices positive definite)} give rise to the term:
+moreover in presence of energy-dissipating effects, the non-conservative generalized forces appear on the right side of (\ref{eq:completemod}), for example viscous friction $\Fm_{\!\theta}$, $\Fm_{\!q}$ of the two sides of the transmissions and spring damping $\Dm$ of the joints (all matrices diagonal and positive definite) give rise to the term:
 \begin{equation}
-    \begin{pmatrix} -F_q\Dot{q}-D(\Dot{q}-\Dot{\theta}) \\
-    -F_\theta\Dot{\theta}-D(\Dot{\theta}-\Dot{q})
+    \begin{pmatrix} -\Fm_{\!q}\dqv-\Dm(\dqv-\dthetav) \\
+    -\Fm_{\!\theta}\dthetav-\Dm(\dthetav-\dqv)
     \end{pmatrix}
 \end{equation}
-Eventually, it's interesting to note that when $K \rightarrow \infty $, then $\theta \rightarrow q $ while the elastic torque $\tau_j=K(\theta-q) \rightarrow u$, making (\ref{eq:completemod}) collapse into the standard fully rigid robot model.
+Eventually, it's interesting to note that when $\Km \rightarrow \infty $, then $\thetav \rightarrow \qv $ while the elastic torque $\tauv_{\!j}=\Km(\thetav-\qv) \rightarrow \uv$, making (\ref{eq:completemod}) collapse into the standard fully rigid model.

@@ -64,23 +64,28 @@
 \let\theauthor\@author
 \let\thedate\@date
 \makeatother
+\input {boldfacemath.tex}
 
 \begin{document}
-
 \include{title}
 \newpage
 \tableofcontents
 \newpage
+
 \subfile{chapters/01_Introduction}
 \clearpage
 \subfile{chapters/02_Dynamicmod}
 \clearpage
 \subfile{chapters/03_Posreg}
-\subfile{chapters/04_Experim}
+\subfile{chapters/04_Implementation}
 \clearpage
+\subfile{chapters/05_Conclusions}
 \bibliographystyle{unsrt}
 \bibliography{ref}
 \nocite{*}  % to include references which were not cited
 %\addcontentsline{toc}{chapter}{references}
 
+
+% open quotes alt gr + v “
+% close quotes alt gr + b ”
 \end{document}

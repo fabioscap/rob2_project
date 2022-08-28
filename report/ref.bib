@@ -1,5 +1,45 @@
+
+
+@ARTICLE{simplepd,
+  author={Tomei, P.},
+  journal={IEEE Transactions on Automatic Control}, 
+  title={A simple {PD} controller for robots with elastic joints}, 
+  year={1991},
+  volume={36},
+  number={10},
+  pages={1208-1213},
+  doi={10.1109/9.90238}
+}
+
+@INPROCEEDINGS{pdstable,
+  author={De Luca, A. and Siciliano, B.},
+  booktitle={Proceedings of the 31st IEEE Conference on Decision and Control}, 
+  title={An {Asymptotically} {Stable} {Joint} {PD} {Controller} for {Robot} {Arms} with {Flexible} {Links} {Under} {Gravity}}, 
+  year={1992},
+  volume={},
+  number={},
+  pages={325-326 vol.1},
+  doi={10.1109/CDC.1992.371728}}
+  
+@article{deluca93,
+author = {De Luca, A.  and Panzieri, S.},
+title = {Learning {Gravity} {Compensation} in {Robots}: Rigid {Arms}, {Elastic} {Joints}, {Flexible} {Links}},
+year = {1993},
+publisher = {John Wiley & Sons, Inc.},
+address = {USA},
+volume = {7},
+number = {5},
+issn = {0890-6327},
+url = {https://doi.org/10.1002/acs.4480070510},
+doi = {10.1002/acs.4480070510},
+journal = {Int. J. Adapt. Control Signal Process.},
+pages = {417–433},
+numpages = {17},
+keywords = {Elastic joints, Robot control, Regulation, Flexible manipulators, Iterative learning}
+}
+
 @article{deluca96,
-author = {De Luca, Alessandro and Panzieri, Stefano},
+author = {De Luca, A. and Panzieri, S.},
 title = {End-effector regulation of robots with elastic elements by an iterative scheme},
 journal = {International Journal of Adaptive Control and Signal Processing},
 volume = {10},
@@ -9,54 +49,14 @@ keywords = {robot control, regulation, elastic joints, flexible manipulators, it
 doi = {https://doi.org/10.1002/(SICI)1099-1115(199607)10:4/5<379::AID-ACS369>3.0.CO;2-O},
 url = {https://onlinelibrary.wiley.com/doi/abs/10.1002/%28SICI%291099-1115%28199607%2910%3A4/5%3C379%3A%3AAID-ACS369%3E3.0.CO%3B2-O},
 eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1002/%28SICI%291099-1115%28199607%2910%3A4/5%3C379%3A%3AAID-ACS369%3E3.0.CO%3B2-O},
-abstract = {Abstract The regulation of motor variable positions in robots with elastic elements has been solved using PD linear controllers in the absence of gravity and with the addition of a-model-based feedforward term when gravity is present. When the mass of the links is not known, an iterative learning scheme can be derived to obtain the same result for both joint elasticity and link flexibility. An extension to end-effector regulation with a similar two-stage and hence time-consuming scheme has been proposed. In this paper we show the feasibility of a new iterative one-stage scheme able to directly regulate the end-effector position in robots with joint elasticity and in robots whose distributed flexibility is limited for each link to the plane orthogonal to the associated motor axis. Experimental results are included to show the improved rate of convergence of the proposed scheme applied to a two-link flexible robot available in our laboratory.},
 year = {1996}
-}
-@article{deluca93,
-author = {Luca, Alessandro De and Panzieri, Stefano},
-title = {Learning Gravity Compensation in Robots: Rigid Arms, Elastic Joints, Flexible Links},
-year = {1993},
-issue_date = {September 1993},
-publisher = {John Wiley & Sons, Inc.},
-address = {USA},
-volume = {7},
-number = {5},
-issn = {0890-6327},
-url = {https://doi.org/10.1002/acs.4480070510},
-doi = {10.1002/acs.4480070510},
-abstract = {The setpoint regulation problem for robotic manipulators is a basic task that can be solved either by PID control or by model-based gravity compensation. These approaches are commonly applied both to rigid arms and to robots with flexible links and/or elastic joints. However, PID control requires fine and lengthy tuning of gains in order to achieve good performance over the whole workspace. Moreover, no global convergence proof has yet been given for this control law in the case of flexible links or elastic joints. On the other hand, a constant or even a configuration-dependent gravity compensation is only an approximate solution when an unknown payload is present or when model parameters are poorly estimated. In this paper a simple iterative scheme is proposed for generating exact gravity compensation at the desired setpoint without the knowledge of dynamic model terms. The resulting control law is shown to be global asymptotically stable for rigid arms as well as for manipulators with elastic joints or flexible links. Starting with a PD action on the error at the joint i.e. motor level, an additional feedforward term is built and updated at discrete instants. Convergence of the scheme is proved under a mild condition on the proportional gain, related to a bound on the gravity terms. In the presence of concentrated or distributed flexibility a structural property of the joint or of the link stiffness is further required, largely satisfied in practice. Simulation results are given for a three-link rigid arm and experimental results are also presented for a two-link robot with a flexible forearm.},
-journal = {Int. J. Adapt. Control Signal Process.},
-month = {sep},
-pages = {417–433},
-numpages = {17},
-keywords = {Elastic joints, Robot control, Regulation, Flexible manipulators, Iterative learning}
-}
-@ARTICLE{simplepd,
-  author={Tomei, P.},
-  journal={IEEE Transactions on Automatic Control}, 
-  title={A simple PD controller for robots with elastic joints}, 
-  year={1991},
-  volume={36},
-  number={10},
-  pages={1208-1213},
-  doi={10.1109/9.90238}
 }
 
 @book{13sic,
-author = {Siciliano, Bruno and Khatib, Oussama},
+author = {Siciliano, B. and Khatib, O.},
 title = {Springer Handbook of Robotics},
 year = {2007},
 isbn = {354023957X},
 publisher = {Springer-Verlag},
 address = {Berlin, Heidelberg}
 }
-
-@INPROCEEDINGS{pdstable,
-  author={De Luca, A. and Siciliano, B.},
-  booktitle={[1992] Proceedings of the 31st IEEE Conference on Decision and Control}, 
-  title={An asymptotically stable joint PD controller for robot arms with flexible links under gravity}, 
-  year={1992},
-  volume={},
-  number={},
-  pages={325-326 vol.1},
-  doi={10.1109/CDC.1992.371728}}

@@ -1,0 +1,134 @@
+\section{Implementation}
+\subsection{Simulink}
+We will now discuss the technical details of the implementation used for simulating the robot. We used Simulink as our main simulator for this project. The 3R rigid robot has been implemented using a Matlab function block that computes the direct dynamics followed by two integrators. To turn this into an elastic joint robot, we put a block that takes care of the spring coupling between motor and link by exchanging elastic forces between $\qv$ and $\thetav$. To implement the iterative control law, we crafted a ``sample and hold block" Figure~\ref{sandh} which samples the input only when a certain boolean signal has a rising edge. This has been used to update the terms $\uv_i$ and $\thetav_{d,i}$ in the control law. The update condition was first set to a threshold $thr$ on $\dthetav$ to detect the steady state:
+\[
+    upd : \| \dthetav \| < thr = 10^{-3}
+\]
+This worked quite well on the rigid robot but far less on the elastic joint one, as a matter of fact in most simulations this condition was never met, resulting in no iterations. This is caused by the high frequency oscillations in the model that never let the velocities cancel. This behavior arises from the fact that we did not model any kind of dissipation in the robot, particularly by including relative spring damping $\Dm\ddeltav$ those oscillations would automatically dampen. Another possible solution is to conduct the update at certain time steps where you assume the robot had enough time to reach an approximate steady state; this way, the quantities updated are estimated (i.e. $\uv_i \neq \gv(\qv_i) $) but in practice we have found that despite this the robot reaches the desired configuration, the fastest results are attained when the conditions are in or.
+
+\begin{figure}[h!]
+\centerline{\includegraphics[scale=0.4]{figures/sampleandhold.png}}
+\caption{\label{sandh}
+The ``sample and hold block" used in our controllers, exploiting boolean logic it's possible to output the correct signal during each iteration.}
+\end{figure}
+\subsection{Simulations}
+We've carried out some simulations testing the performance of the iterative controller with various cases of stiffness down to very soft joints, while keeping constant the other robot parameters: the links have equal length $l = 1$ [m], with uniformly distributed masses $m_1 = 10$, $m_2 = 7.5$, $m_3 = 5$ [kg]. We've also tried different gain matrices to understand how much the sufficient assumptions could be relaxed. Using a random sampling of the q-space we have been able to estimate $\alpha \approx 340$.
+\subsubsection{High stiffness}
+To validate our script we started using the huge levels of stiffness we found in \cite{simplepd}: $K_1 = 14210$, $ = 29800$, $K_3 = 13500 $~[Nm rad$^{-1}$], in this situation it is possible to play with $\gamma$ and $\beta $ in such a way that the gains are not very high while completely satisfying the convergence assumptions. Being into the bounds even when $\gamma = 35$, it's possible to set $\beta = 0.47$ and with $\Km_{\!P} = \mbox{diag}\left\{600, 500, 400\right\}$,  $\Km_{\!D}=\mbox{diag}\left\{200,200,200\right\}$ we succeeded easily in all our trials. We observe it in our first simulation that consist in reaching $\qv_d=(\pi/4,0,\pi/2)^T$ from $\qv_0=(-\pi/2,0,0)^T$ at rest: Figures~\ref{1_1err}--\ref{1_1ceff} show the errors and the applied torques (control effort) over 12 seconds, with a new iteration each 3 seconds only four are needed to converge. It is interesting to note how in Figure~\ref{1_1qt} there is nearly no displacement between $\qv$ and $\thetav$, indeed as we said this is a feature of elastic joint robots and we are in a configuration where it's hard to spot the difference with the rigid case, in a certain sense we are using the same method validated for that kind of robots but with stronger assumption so one can expect to perform very well.
+\begin{figure}[h!]
+\centerline{\includegraphics[scale=0.65]{figures/1_1_error.eps}}
+\caption{\label{1_1err}
+Simulation 1: joint level error.}
+\end{figure}
+
+\begin{figure}[h!]
+\centerline{\includegraphics[scale=0.65]{figures/1_1_thetadelta.eps}}
+\caption{\label{1_1qt}
+Simulation 1: $\theta$ and $\delta$ evolution.}
+\end{figure}
+
+\begin{figure}[h!]
+\hspace{-0.1cm}\centerline{\includegraphics[scale=0.65]{figures/1_1_effort.eps}}
+\caption{\label{1_1ceff}
+Simulation 1: applied torque.}
+\end{figure}
+\clearpage
+\subsubsection{Medium stiffness}
+After that, to get meaningful results we considerably scale down the stiffness to what we call ``medium value'' according to our investigations: $K_1 = 2100$, $K_2 = 4500$, $K_3 = 1500$~[Nm rad$^{-1}$]. Setting $\gamma = 5$, $\beta = 0.3$, we've configured the control with little gains $\Km_{\!P} = \mbox{diag}\left\{200, 200, 200\right\}$,
+$\Km_{\!D}=\mbox{diag}\left\{150,150,150\right\}$. Predictably the convergence will be slower, but it is not the only problem; we are not satisfying many assumption of the theorem: a) due to $K_3$ and b) due to the fact that each element of $\Km_{\!P}$ is lower than $\alpha$. Nevertheless, as it's possible to see in Figures~\ref{2_1err}--\ref{2_2ceff} we are performing very well both on simulation 2 (which aim to reproduce sim. 1 with the new parameters) and simulation 3 (which brings the arm in $\qv_d=(0,0,0)^T$ from the same initial conditions of sim. 2). This suggests for example that in c) $\beta$ is not ``strictly'' constrained and, in general, that a)--d) are not necessary conditions.  
+However, 3 seconds step iteration regardless of the robot’ state, requires seven updates for Sim. 2 and five for sim. 3. In these cases is much easier to identify the displacement from Figures~\ref{2_1qt}\&\ref{2_2qt} since the elasticity is not negligible.
+In order to complete this analysis we show how in sim. 2 (very similar results apply to all the success case) the control term converges to the gravity one in the desired configuration Figure~\ref{2_1gravff} and how slowly $\thetav_d$ departs from $\qv_d$ as the time pass Figure~\ref{2_1tqd}. Lastly, if one is curious to verify which is the steady state error of the simple PD controller in Figure~\ref{2_1pdvit} we even compare its performance with the iterative method assuring to have the same $\Km_{\!P}$, indeed we have identical behaviour before the first update.
+
+\subsubsection{Low stiffness}
+To test the limits of the iterative controller we further soften the stiffness to the values: $K_1 = 1500$, $K_2 = 1000$, $K_3 = 500$~[Nm rad$^{-1}$]. With these parameters we violate the conditions of convergence, event with the smallest possible value of $\gamma$ which is $2$. As a consequence we get a tiny value for $\beta = 1/400$, and since our proportional gain is divided by beta, we have to set it very low to avoid unwanted oscillations. In this simulation (from $\qv_0=(-\pi/2,0,0)^T$ at rest to $\qv_d=(\pi/4,0,\pi/2)^T$) we have set $\Km_{\!P} = \mbox{diag}\left\{7.5, 5, 0.75\right\}$, $\Km_{\!D}=\mbox{diag}\left\{2000,1000,800\right\}$. The small proportional gains nowhere near satisfy condition c) of the convergence proof. 
+The high derivative gain values are justified by the fact that we want to excite as less oscillations as possible on motor positions while slowly moving them to $\thetav_d$, in order to keep link positions close to motor positions. Here we do not have perfect convergence, but we get pretty close to it after four iterations with just some very small oscillations around $\qv_d$ of amplitude $0.03$ [rad] Figure \ref{4_e}. By lowering $\Km_{\!D}$ to $\mbox{diag}\left\{200,200,200\right\}$ we do not get convergence at all, and a oscillatory behavior arises on $\thetav$. This also translates in poor joint torque profiles Figure \ref{5_u}.
+
+~\\
+~\\
+\begin{center}
+\begin{figure}[h!]
+\begin{minipage}[h!]{0.45\linewidth}
+\begin{center}
+    \includegraphics[scale=0.52]{figures/2_1_error.eps}
+    \caption{\label{2_1err} 
+    Sim. 2: joint level error.}
+    \vspace{1cm}
+    \includegraphics[scale=0.52]{figures/2_1_thetadelta.eps}
+    \caption{\label{2_1qt} 
+    Sim. 2: $\thetav$ and $\deltav$ evolution.}
+    \vspace{1cm}
+    \hspace{-0.1cm}\includegraphics[scale=0.52]{figures/2_1_effort.eps}
+    \caption{\label{2_1ceff} 
+    Sim. 2: applied torque.}
+\end{center}
+    \end{minipage}
+    \hspace{0.5cm}
+    \begin{minipage}[h!]{0.45\linewidth}
+    \begin{center}
+    \includegraphics[scale=0.52]{figures/2_2_error.eps}
+    \caption{\label{2_2err} 
+    Sim. 3: joint level error.}
+    \vspace{1cm}
+    \includegraphics[scale=0.52]{figures/2_2_thetadelta.eps}
+    \caption{\label{2_2qt} 
+    Sim. 3: $\thetav$ and $\deltav$ evolution.}
+    \vspace{1cm}
+    \hspace{-0.1cm}\includegraphics[scale=0.51]{figures/2_2_effort.eps}
+    \caption{\label{2_2ceff} 
+    Sim. 3: applied torque.}
+\end{center}
+\end{minipage}
+\end{figure}
+\end{center}
+
+
+\begin{center}
+\begin{figure}[!h]
+\centerline{\includegraphics[scale=0.65]{figures/2_1_grcomp.eps}}
+\caption{\label{2_1gravff}
+Simulation 2: evolution of $u_{t-i}$ w.r.t. $\gv(\qv_d)$.}
+\end{figure}
+
+\begin{figure}[!h]
+\centerline{\includegraphics[scale=0.65]{figures/2_1_thetaref.eps}}
+\caption{\label{2_1tqd}
+Simulation 2: evolution of $\thetav_d$ w.r.t. $\qv_d$.}
+\end{figure}
+
+\begin{figure}[!h]
+\hspace{-0.25cm}\centerline{\includegraphics[scale=0.65]{figures/2_1_PDcomp.eps}}
+\caption{\label{2_1pdvit}
+Simulation 2: PD vs Iterative Scheme.}
+\end{figure}
+\end{center}
+
+
+\begin{center}
+\begin{figure}[h!]
+\begin{minipage}[h!]{0.45\linewidth}
+\begin{center}
+\hspace{-0.1cm}\includegraphics[scale=0.52]{figures/3_1_error.eps}
+\caption{\label{4_e} Sim. 4: joint level error.}
+\vspace{1cm}
+\includegraphics[scale=0.52]{figures/3_1_thetadelta.eps}
+\caption{\label{4_qt}Sim. 4: $\thetav$ and $\deltav$ evolution.}
+\vspace{1cm}
+\hspace{-0.1cm}\includegraphics[scale=0.51]{figures/3_1_effort.eps}
+\caption{\label{4_u}Sim. 4: applied torque.}
+\end{center}
+\end{minipage}
+\hspace{0.5cm}
+\begin{minipage}[h!]{0.45\linewidth}
+\begin{center}
+\hspace{-0.1cm}\includegraphics[scale=0.52]{figures/3_2_error.eps}
+\caption{\label{5_e}Sim. 5: joint level error.}
+\vspace{1cm}
+\includegraphics[scale=0.52]{figures/3_2_thetadelta.eps}
+\caption{\label{5_qt}Sim. 5: $\thetav$ and $\deltav$ evolution.}
+\vspace{1cm}
+\hspace{-0.1cm}\includegraphics[scale=0.51]{figures/3_2_effort.eps}
+\caption{\label{5_u}Sim. 5: applied torque.}
+\end{center}
+\end{minipage}
+\end{figure}
+\end{center}
