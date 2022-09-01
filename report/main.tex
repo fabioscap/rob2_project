@@ -46,6 +46,7 @@
 \newcommand{\reqnomode}{\tagsleft@false\let\veqno\@@eqno}%
 \newcommand*{\compress}{\@minipagetrue}
 \makeatother
+\usepackage{silence}
 % --------------------------------------------- %
 \title{Gravity learning for elastic joint robots}	                                    % Title
 \author{\small{Dennis Rotondi 1834864}\\ \small{Fabio Scaparro ~1834913}}				                % Authors separated by \\
@@ -67,6 +68,7 @@
 \input {boldfacemath.tex}
 
 \begin{document}
+\WarningFilter*{latex}{Text page \thepage\space contains only floats}
 \include{title}
 \newpage
 \tableofcontents

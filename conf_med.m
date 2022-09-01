@@ -88,7 +88,7 @@ for i=1:3
     plot(out.ffw.Time,out.ffw.Data(:,i),"DisplayName","ffw"+i,"LineWidth",2); hold on;
     plot(out.ffw.Time,grqd(i)*ones(1,length(out.theta.Time)),"DisplayName","grav"+i,"LineStyle","- -","LineWidth",2);
     legend('Location','SouthEast');
-    ylim([-100 300])
+    ylim([min(out.ffw.Data(:,i))-50 max(out.ffw.Data(:,i))+50])
     xline(iterations,'--','HandleVisibility','off');
 end
 
